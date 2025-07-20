@@ -40,6 +40,7 @@ def is_librarian(user):
 
 def is_member(user):
     return user.is_authenticated and hasattr(user, 'userprofile') and user.userprofile.role == 'Member'
+    #Checks for A ‘Member’ view for users with the ‘Member’ role. task
 
 # Role-based views decorated with @user_passes_test
 @user_passes_test(is_admin)
