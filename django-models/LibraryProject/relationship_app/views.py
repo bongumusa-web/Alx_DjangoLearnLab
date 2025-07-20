@@ -3,32 +3,8 @@ from django.views.generic.detail import DetailView
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import user_passes_test
-from django.contrib.auth.models import User
-from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
-from .models import Book, Library
-
-# ========== UserProfile Model with Role ==========
-class UserProfile(models.Model):
-    ROLE_CHOICES = [
-        ('Admin', 'Admin'),
-        ('Librarian', 'Librarian'),
-        ('Member', 'Member'),
-    ]
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES)
-
-    def __str__(self):
-        return f"{self.user.username} - {self.role}"
-
-@receiver(post_save, sender=User)
-def create_or_update_user_profile(sender, instance, created, **kwargs):
-    if created:
-        UserProfile.objects.create(user=instance, role='Member')  # default role
-    else:
-        instance.userprofile.save()
+from .models import Book, Library, UserProfile
 
 # ========== Views ==========
 
@@ -37,13 +13,13 @@ def list_books(request):
     books = Book.objects.all()
     return render(request, 'relationship_app/list_books.html', {'books': books})
 
-# Library detail view (class-based)
+# Library detail view
 class LibraryDetailView(DetailView):
     model = Library
     template_name = 'relationship_app/library_detail.html'
     context_object_name = 'library'
 
-# Registration view
+# User registration
 def register(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
