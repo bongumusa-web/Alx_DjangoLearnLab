@@ -129,3 +129,37 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
+# SECURITY SETTINGS
+
+# Ensure DEBUG is False in production
+DEBUG = False  # Turn ON in development only
+
+# Only allow trusted hosts
+ALLOWED_HOSTS = ['yourdomain.com', 'www.yourdomain.com', '127.0.0.1']  # Update with your real domain
+
+# Enable browser-side protections
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'  # Protect against clickjacking
+
+# Use secure cookies
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+
+# Optionally, enforce HTTPS
+SECURE_SSL_REDIRECT = True
+
+# CSP middleware (Step 4, but included here if using django-csp)
+INSTALLED_APPS += ['csp']
+
+MIDDLEWARE += [
+    'csp.middleware.CSPMiddleware',
+]
+
+# Content Security Policy
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_SCRIPT_SRC = ("'self'", 'https://trusted.cdn.com')  # Add allowed CDNs
+CSP_STYLE_SRC = ("'self'", 'https://trusted.cdn.com')
+
+
+
