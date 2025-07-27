@@ -162,4 +162,23 @@ CSP_SCRIPT_SRC = ("'self'", 'https://trusted.cdn.com')  # Add allowed CDNs
 CSP_STYLE_SRC = ("'self'", 'https://trusted.cdn.com')
 
 
+# Enforce HTTPS for all connections
+SECURE_SSL_REDIRECT = True  # Automatically redirect HTTP to HTTPS
+
+# HTTP Strict Transport Security settings
+SECURE_HSTS_SECONDS = 31536000  # Max-age for HSTS policy (1 year)
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # Apply HSTS to all subdomains
+SECURE_HSTS_PRELOAD = True  # Allow browser vendors to preload HTTPS requirement
+
+# Ensure cookies are transmitted securely
+SESSION_COOKIE_SECURE = True  # Session cookies only sent over HTTPS
+CSRF_COOKIE_SECURE = True     # CSRF cookies only sent over HTTPS
+
+# --- SECURITY HEADERS ---
+
+SECURE_BROWSER_XSS_FILTER = True  # Enable the browser's XSS filtering
+SECURE_CONTENT_TYPE_NOSNIFF = True  # Prevent MIME-sniffing
+X_FRAME_OPTIONS = 'DENY'  # Prevent clickjacking by disallowing iframes
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
