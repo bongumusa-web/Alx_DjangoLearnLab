@@ -2,7 +2,8 @@ from django.contrib.auth.decorators import permission_required
 from django.shortcuts import render
 from django.http import HttpResponse
 from .models import Book
-from .forms import SearchForm, ExampleForm  # Include ExampleForm
+from .forms import SearchForm # Include ExampleForm
+from .forms import ExampleForm
 
 # Secure Search View
 def search_books(request):
