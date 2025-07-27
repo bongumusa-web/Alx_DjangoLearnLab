@@ -1,3 +1,7 @@
+{% if success %}
+    <p>Form submitted successfully!</p>
+{% endif %}
+
 <form method="POST">
   {% csrf_token %}
   {{ form.as_p }}
