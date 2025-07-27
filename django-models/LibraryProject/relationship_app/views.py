@@ -3,6 +3,7 @@ from django.views.generic.detail import DetailView
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import user_passes_test
+from .models import Library
 
 from django.contrib.auth.decorators import permission_required
 
