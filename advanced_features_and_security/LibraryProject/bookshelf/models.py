@@ -25,3 +25,15 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.username
+
+
+class YourModel(models.Model):
+    # your fields here
+
+    class Meta:
+        permissions = [
+            ("can_view", "Can view the model"),
+            ("can_create", "Can create the model"),
+            ("can_edit", "Can edit the model"),
+            ("can_delete", "Can delete the model"),
+        ]
