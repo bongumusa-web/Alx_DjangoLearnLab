@@ -1,29 +1,41 @@
-from rest_framework import generics
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated  # ✅ Required by checker
+from rest_framework import generics, filters
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import Book
 from .serializers import BookSerializer
 
 
-# Show all books (readable by anyone)
+# Show all books (readable by anyone) + Filtering, Searching, Ordering
 class BookListView(generics.ListAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]  # ✅ Allows read for all, write for logged-in only
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+   
+    filter_backends = [
+        DjangoFilterBackend,          # enables filtering
+        filters.SearchFilter,         # enables search
+        filters.OrderingFilter         # enables ordering
+    ]
+    filterset_fields = ['title', 'author', 'publication_year']  # filter by these exact fields
+    search_fields = ['title', 'author']  # search in title & author
+    ordering_fields = ['title', 'publication_year']  # allow ordering by these fields
+    ordering = ['title']  # default ordering
 
 
 # Show one book (readable by anyone)
 class BookDetailView(generics.RetrieveAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]  # ✅ Same here
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 # Add a book (must be logged in)
 class BookCreateView(generics.CreateAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [IsAuthenticated]  # ✅ Must be logged in
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         serializer.save()
