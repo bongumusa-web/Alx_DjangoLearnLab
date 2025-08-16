@@ -140,7 +140,12 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+<<<<<<< HEAD
 USER_MODEL = 'blog.User'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+=======
+
+USER_MODEL = 'blog.User'
+>>>>>>> 6b1e80baed530c0a971555ed712bf881a076b8a0
