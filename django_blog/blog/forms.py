@@ -6,6 +6,8 @@ from django import forms
 from .models import Post
 from .models import Comment
 
+
+
 # form for registration
 class UserRegisterForm(UserCreationForm):
     class Meta:
@@ -30,22 +32,16 @@ class ProfileUpdateForm(forms.ModelForm):
 
 
 # post 
-
-
-
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ['title', 'content']  # author is set automatically
+        fields = ['title', 'content', 'tags']  # author is set automatically
 
 
 
 
 
-# Comment 
-
-
-
+# Comment Form
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
@@ -53,3 +49,8 @@ class CommentForm(forms.ModelForm):
         widgets = {
             'content': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Write a comment...'}),
         }
+
+
+
+
+

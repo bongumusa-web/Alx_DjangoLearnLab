@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
+from django.db.models import Q
 from django.views.generic import (
     ListView, DetailView, CreateView, UpdateView, DeleteView
 )
@@ -56,11 +57,34 @@ def profile(request):
 # Blog Post Views
 # ==========================
 
+from django.db.models import Q
+
 class PostListView(ListView):
     model = Post
     template_name = 'blog/post_list.html'
     context_object_name = 'posts'
-    ordering = ['-published_date']  # filter by published date
+    ordering = ['-published_date']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        query = self.request.GET.get('q')
+        if query:
+            queryset = queryset.filter(
+                Q(title__icontains=query) |
+                Q(content__icontains=query) |
+                Q(tags__name__icontains=query)
+            ).distinct()
+        return queryset
+
+# filtering :
+class TagPostListView(ListView):
+    model = Post
+    template_name = 'blog/post_list.html'
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        return Post.objects.filter(tags__name__iexact=self.kwargs['tag_name'])
+
 
 
 class PostDetailView(DetailView):
@@ -108,13 +132,16 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
     template_name = 'blog/add_comment.html'
 
     def form_valid(self, form):
+        # Attach current user as author
         form.instance.author = self.request.user
-        form.instance.post = get_object_or_404(Post, pk=self.kwargs['post_id'])
+        # Attach the post using URL pk
+        post = get_object_or_404(Post, pk=self.kwargs['pk'])
+        form.instance.post = post
         return super().form_valid(form)
 
     def get_success_url(self):
+        # Redirect to the post detail page after saving
         return self.object.post.get_absolute_url()
-
 
 class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Comment

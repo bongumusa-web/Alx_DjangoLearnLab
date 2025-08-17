@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.urls import reverse
+from taggit.managers import TaggableManager
 
 
 # Blog Post model
@@ -11,6 +12,9 @@ class Post(models.Model):
     content = models.TextField()
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     published_date = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    tags = TaggableManager()  # for tagging functionality
 
     def __str__(self):
         return self.title
