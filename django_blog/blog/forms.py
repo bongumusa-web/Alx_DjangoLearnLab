@@ -5,6 +5,7 @@ from .models import Profile
 from django import forms
 from .models import Post
 from .models import Comment
+from taggit.forms import TagWidget
 
 
 
@@ -32,10 +33,15 @@ class ProfileUpdateForm(forms.ModelForm):
 
 
 # post 
+# post 
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = ['title', 'content', 'tags']  # author is set automatically
+        widgets = {
+            'tags': TagWidget(),
+        }
+
 
 
 
