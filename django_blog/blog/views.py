@@ -57,7 +57,7 @@ def profile(request):
 # Blog Post Views
 # ==========================
 
-from django.db.models import Q
+
 
 class PostListView(ListView):
     model = Post
@@ -76,15 +76,16 @@ class PostListView(ListView):
             ).distinct()
         return queryset
 
-# filtering :
-class TagPostListView(ListView):
+
+# filtering posts by tag slug
+class PostByTagListView(ListView):
     model = Post
     template_name = 'blog/post_list.html'
     context_object_name = 'posts'
 
     def get_queryset(self):
-        return Post.objects.filter(tags__name__iexact=self.kwargs['tag_name'])
-
+        tag_slug = self.kwargs['tag_slug']  # match URL param
+        return Post.objects.filter(tags__slug__iexact=tag_slug)
 
 
 class PostDetailView(DetailView):

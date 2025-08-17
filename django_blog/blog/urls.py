@@ -1,12 +1,12 @@
 from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
+from django.views.generic import TemplateView
 from .views import (
     PostListView, PostDetailView, PostCreateView, PostUpdateView, PostDeleteView,
     CommentCreateView, CommentUpdateView, CommentDeleteView,
-    TagPostListView
+    PostByTagListView
 )
-
 
 urlpatterns = [
     # Auth
@@ -27,6 +27,6 @@ urlpatterns = [
     path('comment/<int:pk>/update/', CommentUpdateView.as_view(), name='edit-comment'),
     path('comment/<int:pk>/delete/', CommentDeleteView.as_view(), name='delete-comment'),
 
-    # 🔹 New Tag URL
-    path('tag/<str:tag_name>/', TagPostListView.as_view(), name='posts-by-tag'),
+    # ✅ Tag URL (fixed)
+    path('tags/<slug:tag_slug>/', PostByTagListView.as_view(), name='posts-by-tag'),
 ]
