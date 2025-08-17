@@ -4,6 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 from .models import Profile
 from django import forms
 from .models import Post
+from .models import Comment
 
 # form for registration
 class UserRegisterForm(UserCreationForm):
@@ -36,3 +37,19 @@ class PostForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = ['title', 'content']  # author is set automatically
+
+
+
+
+
+# Comment 
+
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Write a comment...'}),
+        }
