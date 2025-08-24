@@ -31,6 +31,7 @@ class PostViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
+    # like action
     @action(detail=True, methods=["post"], permission_classes=[permissions.IsAuthenticated])
     def like(self, request, pk=None):
         post = get_object_or_404(Post, pk=pk)
@@ -46,6 +47,7 @@ class PostViewSet(viewsets.ModelViewSet):
             )
         return Response({"status": "post liked"})
 
+    # unlike action
     @action(detail=True, methods=["post"], permission_classes=[permissions.IsAuthenticated])
     def unlike(self, request, pk=None):
         post = get_object_or_404(Post, pk=pk)
