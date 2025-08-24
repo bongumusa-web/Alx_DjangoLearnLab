@@ -2,18 +2,16 @@ from rest_framework import generics, permissions
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
-from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django.contrib.contenttypes.models import ContentType
 
 from .serializers import RegisterSerializer, UserSerializer
+from .models import CustomUser  # import the CustomUser model
 from notifications.models import Notification
-
-User = get_user_model()
 
 
 class RegisterView(generics.CreateAPIView):
-    queryset = User.objects.all()
+    queryset = CustomUser.objects.all()
     serializer_class = RegisterSerializer
 
 
@@ -40,10 +38,9 @@ class FollowUserView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, user_id):
-        user_to_follow = get_object_or_404(User, id=user_id)
+        user_to_follow = get_object_or_404(CustomUser.objects.all(), id=user_id)
         request.user.following.add(user_to_follow)
 
-        # Create notification (avoid self-notify)
         if user_to_follow != request.user:
             Notification.objects.create(
                 recipient=user_to_follow,
@@ -60,6 +57,6 @@ class UnfollowUserView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, user_id):
-        user_to_unfollow = get_object_or_404(User, id=user_id)
+        user_to_unfollow = get_object_or_404(CustomUser.objects.all(), id=user_id)
         request.user.following.remove(user_to_unfollow)
         return Response({"status": f"You unfollowed {user_to_unfollow.username}"})
