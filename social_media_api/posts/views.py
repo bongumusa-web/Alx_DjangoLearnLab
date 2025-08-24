@@ -1,15 +1,13 @@
-from rest_framework import viewsets, permissions, filters
+from rest_framework import viewsets, permissions, filters, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.models import ContentType
 
 from .models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer
-from accounts.serializers import UserSerializer  
-
-from rest_framework import generics, permissions
-from .models import Post
-
+from accounts.serializers import UserSerializer
+from notifications.models import Notification
 
 User = get_user_model()
 
@@ -34,14 +32,22 @@ class PostViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-    # Like a post
     @action(detail=True, methods=["post"], permission_classes=[permissions.IsAuthenticated])
     def like(self, request, pk=None):
         post = self.get_object()
         post.likes.add(request.user)
+
+        # Create notification (avoid self-notify)
+        if post.author != request.user:
+            Notification.objects.create(
+                recipient=post.author,
+                actor=request.user,
+                verb="liked your post",
+                content_type=ContentType.objects.get_for_model(post),
+                object_id=post.id
+            )
         return Response({"status": "post liked"})
 
-    # Unlike a post
     @action(detail=True, methods=["post"], permission_classes=[permissions.IsAuthenticated])
     def unlike(self, request, pk=None):
         post = self.get_object()
@@ -58,25 +64,22 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
 
-# Follow/Unfollow users
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = UserSerializer  
+    serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     @action(detail=True, methods=["post"])
     def follow(self, request, pk=None):
         user = self.get_object()
-        request.user.followers.add(user)
+        request.user.following.add(user)  # assuming 'following' is a ManyToMany field on User
         return Response({"status": f"You followed {user.username}"})
 
     @action(detail=True, methods=["post"])
     def unfollow(self, request, pk=None):
         user = self.get_object()
-        request.user.followers.remove(user)
+        request.user.following.remove(user)
         return Response({"status": f"You unfollowed {user.username}"})
-
-
 
 
 class FeedView(generics.ListAPIView):
@@ -85,5 +88,5 @@ class FeedView(generics.ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        following_users = user.following.all()  # assign to variable
+        following_users = user.following.all()  # adjust based on your model field
         return Post.objects.filter(author__in=following_users).order_by('-created_at')
