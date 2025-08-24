@@ -33,10 +33,9 @@ class PostViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"], permission_classes=[permissions.IsAuthenticated])
     def like(self, request, pk=None):
-        post = get_object_or_404(Post, pk=pk)  # checker wants this
-        like, created = Like.objects.get_or_create(user=request.user, post=post)  # checker wants this
+        post = get_object_or_404(Post, pk=pk)
+        like, created = Like.objects.get_or_create(user=request.user, post=post)
 
-        # Create notification if new like and not self-like
         if created and post.author != request.user:
             Notification.objects.create(
                 recipient=post.author,
@@ -49,7 +48,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"], permission_classes=[permissions.IsAuthenticated])
     def unlike(self, request, pk=None):
-        post = get_object_or_404(Post, pk=pk)  # checker wants this
+        post = get_object_or_404(Post, pk=pk)
         Like.objects.filter(user=request.user, post=post).delete()
         return Response({"status": "post unliked"})
 
@@ -72,7 +71,6 @@ class UserViewSet(viewsets.ModelViewSet):
     def follow(self, request, pk=None):
         user = self.get_object()
         request.user.following.add(user)
-        # Notification for follow
         if user != request.user:
             Notification.objects.create(
                 recipient=user,
@@ -94,5 +92,5 @@ class FeedView(generics.ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        following_users = user.following.all()  # checker wants this variable
+        following_users = user.following.all()
         return Post.objects.filter(author__in=following_users).order_by('-created_at')
