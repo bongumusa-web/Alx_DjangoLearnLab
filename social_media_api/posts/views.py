@@ -3,7 +3,6 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
-from django.shortcuts import get_object_or_404
 
 from .models import Post, Comment, Like
 from .serializers import PostSerializer, CommentSerializer
@@ -31,10 +30,9 @@ class PostViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-    # like action
     @action(detail=True, methods=["post"], permission_classes=[permissions.IsAuthenticated])
     def like(self, request, pk=None):
-        post = get_object_or_404(Post, pk=pk)
+        post = generics.get_object_or_404(Post, pk=pk)
         like, created = Like.objects.get_or_create(user=request.user, post=post)
 
         if created and post.author != request.user:
@@ -47,10 +45,9 @@ class PostViewSet(viewsets.ModelViewSet):
             )
         return Response({"status": "post liked"})
 
-    # unlike action
     @action(detail=True, methods=["post"], permission_classes=[permissions.IsAuthenticated])
     def unlike(self, request, pk=None):
-        post = get_object_or_404(Post, pk=pk)
+        post = generics.get_object_or_404(Post, pk=pk)
         Like.objects.filter(user=request.user, post=post).delete()
         return Response({"status": "post unliked"})
 
