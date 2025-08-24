@@ -4,6 +4,9 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from .serializers import RegisterSerializer, UserSerializer
+from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
+
 
 User = get_user_model()
 
@@ -27,3 +30,22 @@ class ProfileView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+
+class FollowUserView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, user_id):
+        user_to_follow = get_object_or_404(User, id=user_id)  # uses get_user_model()
+        request.user.following.add(user_to_follow)
+        return Response({"status": f"You followed {user_to_follow.username}"})
+
+
+class UnfollowUserView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, user_id):
+        user_to_unfollow = get_object_or_404(User, id=user_id)  # uses get_user_model()
+        request.user.following.remove(user_to_unfollow)
+        return Response({"status": f"You unfollowed {user_to_unfollow.username}"})

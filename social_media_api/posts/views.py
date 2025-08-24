@@ -7,6 +7,10 @@ from .models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer
 from accounts.serializers import UserSerializer  
 
+from rest_framework import generics, permissions
+from .models import Post
+
+
 User = get_user_model()
 
 
@@ -71,3 +75,14 @@ class UserViewSet(viewsets.ModelViewSet):
         user = self.get_object()
         request.user.followers.remove(user)
         return Response({"status": f"You unfollowed {user.username}"})
+
+
+
+
+class FeedView(generics.ListAPIView):
+    serializer_class = PostSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Post.objects.filter(author__in=user.following.all()).order_by('-created_at')
